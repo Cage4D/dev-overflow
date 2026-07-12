@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
+import ThemeProvider from "@/context/Theme";
 import { cn } from "@/lib/utils";
-import Navbar from "@/components/navigation/navbar";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -44,7 +43,6 @@ export default function RootLayout({
           defaultTheme="system" 
           enableSystem 
           disableTransitionOnChange>
-            <Navbar/>
             {children}
         </ThemeProvider>
       </body>
