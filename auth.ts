@@ -1,6 +1,10 @@
-import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
+import { betterAuth } from "better-auth"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-    providers: [GitHub],
+export const auth = betterAuth({
+    socialProviders: {
+        github: {
+            clientId: process.env.GITHUB_CLIENT_ID as string,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+        },
+    }
 })

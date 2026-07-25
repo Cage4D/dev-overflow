@@ -4,8 +4,6 @@ import "./globals.css";
 import ThemeProvider from "@/context/Theme";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/auth";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -29,30 +27,27 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
   return (
     <html
       lang="en"
       className={cn("h-full", "antialiased", inter.className, spaceGrotesk.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
-      <SessionProvider session={session}>
-        <body className="min-h-full flex flex-col">
-          <ThemeProvider 
-            attribute="class" 
-            defaultTheme="system" 
-            enableSystem 
-            disableTransitionOnChange>
-              {children}
-          </ThemeProvider>
+      <body className="min-h-full flex flex-col">
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem 
+          disableTransitionOnChange>
+            {children}
+        </ThemeProvider>
         <Toaster/>
-        </body>
-      </SessionProvider>
+      </body>
     </html>
   );
 }

@@ -4,25 +4,25 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import ROUTES from "@/constants/routes";
-import { signIn } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 
 export default function SocialAuthForm() {
-    const buttonClass = "background-dark400_light900 body-medium text-dark200_light800 min-h-12 flex-1 rounded-2 px-4 py-3.5"
-    
+    const buttonClass = "background-dark400_light900 body-medium text-dark200_light800 min-h-12 flex-1 rounded-2 px-4 py-3.5";
+
     const handleSignIn = async (provider: "github" | "google") => {
         try {
-            await signIn(provider, {
-                callbackUrl: ROUTES.HOME,
-                redirect: false,
-            })
+            await authClient.signIn.social({
+                provider,
+                callbackURL: ROUTES.HOME,
+            });
         } catch (err) {
-            console.log(err)
-            toast.warning(err instanceof Error ? err.message : "An Error occured during sign-in",)
+            console.log(err);
+            toast.warning(err instanceof Error ? err.message : "An Error occured during sign-in");
         }
-    }
+    };
     return (
         <div className="mt-10 flex flex-wrap gap-2.5">
-            <Button className={buttonClass} onClick={() =>  handleSignIn("github")}>
+            <Button className={buttonClass} onClick={() => handleSignIn("github")}>
                 <Image
                 src="/icons/github.svg"
                 alt="Github Logo"
