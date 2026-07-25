@@ -4,13 +4,20 @@ import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import ROUTES from "@/constants/routes"
+import { toast } from "sonner";
 
 export default function Home() {
     const router = useRouter();
 
     const handleSignOut = async () => {
-        await authClient.signOut();
-        router.push(ROUTES.SIGN_IN)
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => router.push(ROUTES.SIGN_IN),
+                onError: (ctx) => {
+                    toast.warning(ctx.error.message)
+                }
+            }
+        });
     };
     return (
         <div>
