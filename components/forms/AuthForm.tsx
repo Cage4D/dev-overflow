@@ -58,7 +58,7 @@ export default function AuthForm<T extends FieldValues>({
   };
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card className="w-full sm:max-w-md border-none bg-transparent shadow-none">
       <CardHeader>
         <CardTitle>{formType === "SIGN_IN" ? "Welcome back" : "Create an account"}</CardTitle>
         <CardDescription>
