@@ -38,6 +38,9 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", inter.className, spaceGrotesk.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+      </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider 
           attribute="class" 
