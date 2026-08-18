@@ -38,11 +38,9 @@ export default function MobileNavigation() {
                 </p>
               </Link>
               <div className="no-scrollbar flex h-[calc(100vh - 80px)] flex-col justify-between overflow-y-auto">
-                <SheetClose>
-                    <section className="flex h-full flex-col gap-6 pt-16">
-                        <NavLinks isMobileNav/>
-                    </section>
-                </SheetClose>
+                <section className="flex h-full flex-col gap-6 pt-16">
+                    <NavLinks isMobileNav/>
+                </section>
                 <div className="flex flex-col gap-3">
                     <SheetClose>
                         <Link href={ROUTES.SIGN_IN}>

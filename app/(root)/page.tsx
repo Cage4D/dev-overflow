@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import ROUTES from "@/constants/routes";
 import HomeFilter from "@/components/filters/HomeFilter"
 import Link from "next/link"
+import QuestionCard from "@/components/cards/QuestionCard";
 
 interface SearchParams {
     searchParams: Promise<{[key: string]: string}>
@@ -18,7 +19,7 @@ const questions = [
         { _id: "2", name: "Javascript" },
         { _id: "3", name: "Next.js" },
       ],
-      author: { _id: "1", name: "John Doe" },
+      author: { _id: "1", name: "John Doe", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfpbpIzZLZdUlCw0WgKIJlev-hGqdI8pglWeyYtGOzEg&s=10" },
       upvotes: 10,
       answers: 5,
       views: 100,
@@ -33,7 +34,7 @@ const questions = [
         { _id: "2", name: "Javascript" },
         { _id: "3", name: "Next.js" },
       ],
-      author: { _id: "1", name: "John Doe" },
+      author: { _id: "1", name: "Lisa Ann", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLzyK1ng-s8JsFOEjX6hkOSFOodiTNqa24bp3TZJ2c5Q&s=10" },
       upvotes: 10,
       answers: 5,
       views: 100,
@@ -66,7 +67,7 @@ export default async function Home({ searchParams }: SearchParams ) {
             <HomeFilter/>
             <div className="mt-10 flex w-full flex-col gap-6">
                 {filteredQuestions.map(question => (
-                    <h1 key={question._id}>{question.title}</h1>
+                    <QuestionCard key={question._id} question={question}/> 
                 ))}
             </div>
         </>
