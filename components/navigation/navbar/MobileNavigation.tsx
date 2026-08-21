@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -41,20 +40,20 @@ export default function MobileNavigation() {
                 <section className="flex h-full flex-col gap-6 pt-16">
                     <NavLinks isMobileNav/>
                 </section>
-                <div className="flex flex-col gap-3">
-                    <SheetClose>
-                        <Link href={ROUTES.SIGN_IN}>
-                            <Button className="small-medium btn-secondary min-h-10.25 w-full rounded-lg px-4 py-3 shadow-none">
-                                <span className="primary-text-gradient">Log In</span>
-                            </Button>
-                        </Link>
+                <div className="flex flex-col gap-3 mt-3">
+                    <SheetClose
+                        render={<Link href={ROUTES.SIGN_IN} />}
+                        nativeButton={false}
+                        className="small-medium btn-secondary min-h-10.25 flex w-full items-center justify-center rounded-lg px-4 py-3 shadow-none"
+                    >
+                        <span className="primary-text-gradient">Log In</span>
                     </SheetClose>
-                    <SheetClose>
-                        <Link href={ROUTES.SIGN_UP}>
-                            <Button className="small-medium light-border-2 text-dark400_light900 btn-tertiary min-h-10.25 w-full rounded-lg border px-4 py-3 shadow-none">
-                                Sign Up
-                            </Button>
-                        </Link>
+                    <SheetClose
+                        render={<Link href={ROUTES.SIGN_UP} />}
+                        nativeButton={false}
+                        className="small-medium light-border-2 text-dark400_light900 btn-tertiary min-h-10.25 flex w-full items-center justify-center rounded-lg border px-4 py-3 shadow-none"
+                    >
+                        Sign Up
                     </SheetClose>
                 </div>
               </div>

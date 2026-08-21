@@ -11,7 +11,7 @@ export default function LeftSidebar() {
             <div className="flex flex-1 flex-col gap-6">
                 <NavLinks/>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 mt-3">
                 <Button className="small-medium btn-secondary min-h-10.25 w-full rounded-lg px-4 py-3 shadow-none">
                     <Link href={ROUTES.SIGN_IN}>
                         <Image
