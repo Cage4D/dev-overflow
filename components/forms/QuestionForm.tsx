@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { X } from "lucide-react";
@@ -11,10 +11,18 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { z } from "zod";
+import { MDXEditorMethods } from "@mdxeditor/editor";
+import dynamic from 'next/dynamic'
 
 type QuestionFormValues = z.infer<typeof AskQuestionSchema>;
 
+const Editor = dynamic(() => import('@/components/editor'), {
+  // Make sure we turn SSR off
+  ssr: false
+})
+
 export default function QuestionForm() {
+  const editorRef = useRef<MDXEditorMethods>(null);
   const [tagInput, setTagInput] = useState("");
 
   const form = useForm<QuestionFormValues>({
@@ -62,7 +70,7 @@ export default function QuestionForm() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="content">Detailed Explanation <span className="text-primary-500">*</span></FieldLabel>
-              Editor
+              <Editor value={field.value} editorRef={editorRef} fieldChange={field.onChange}/>
             </Field>
           )}
         />
