@@ -4,6 +4,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 import { AskQuestionSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { z } from "zod";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import dynamic from 'next/dynamic'
+import TagCard from "../cards/TagCard";
 
 type QuestionFormValues = z.infer<typeof AskQuestionSchema>;
 
@@ -20,6 +22,9 @@ const Editor = dynamic(() => import('@/components/editor'), {
   // Make sure we turn SSR off
   ssr: false
 })
+
+const MAX_TAGS = 3;
+const MAX_TAG_LENGTH = 15;
 
 export default function QuestionForm() {
   const editorRef = useRef<MDXEditorMethods>(null);
@@ -85,6 +90,17 @@ export default function QuestionForm() {
 
               const newTag = tagInput.trim();
               if (!newTag) return;
+
+              if (newTag.length > MAX_TAG_LENGTH) {
+                toast.warning(`Tags must be ${MAX_TAG_LENGTH} characters or less.`);
+                return;
+              }
+
+              if (field.value.length >= MAX_TAGS) {
+                toast.warning(`You can only add up to ${MAX_TAGS} tags.`);
+                return;
+              }
+
               if (field.value.includes(newTag)) {
                 setTagInput("");
                 return;
@@ -108,21 +124,26 @@ export default function QuestionForm() {
                   onKeyDown={handleAddTag}
                   aria-invalid={fieldState.invalid}
                   autoComplete="off"
-                  placeholder="Type a tag and press Enter"
+                  disabled={field.value.length >= MAX_TAGS}
+                  placeholder={
+                    field.value.length >= MAX_TAGS
+                      ? `Maximum of ${MAX_TAGS} tags reached`
+                      : "Type a tag and press Enter"
+                  }
                   className="paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 no-focus min-h-12 rounded-1.5 border"
                 />
                 {field.value.length > 0 && (
                   <div className="mt-2.5 flex flex-wrap gap-2.5">
                     {field.value.map((tag: string) => (
-                      <button
+                      <TagCard
                         key={tag}
-                        type="button"
-                        onClick={() => handleRemoveTag(tag)}
-                        className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center gap-2 rounded-md border-none px-4 py-2 capitalize"
-                      >
-                        {tag}
-                        <X size={12} />
-                      </button>
+                        _id={tag}
+                        name={tag}
+                        compact
+                        remove
+                        isButton
+                        handleRemove={() => handleRemoveTag(tag)}
+                      />
                     ))}
                   </div>
                 )}
