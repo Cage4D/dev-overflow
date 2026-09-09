@@ -2,12 +2,13 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import dbConnect from "./lib/mongoose";
 import slugify from "slugify";
+import { nextCookies } from "better-auth/next-js"
 
 const mongooseConnection = await dbConnect();
 const client = mongooseConnection.connection.getClient();
 
 export const auth = betterAuth({
-    database: mongodbAdapter(client.db(), { client }),
+    database: mongodbAdapter(client.db("DevFlow"), { client }),
     emailAndPassword: {
         enabled: true,
     },
@@ -47,4 +48,5 @@ export const auth = betterAuth({
             },
         },
     },
+    plugins: [nextCookies()]
 });

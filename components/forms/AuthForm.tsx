@@ -30,7 +30,10 @@ import ROUTES from "@/constants/routes";
 interface AuthFormProps<T extends FieldValues> {
   schema: ZodType<T, T>;
   defaultValues: T;
-  onSubmit: (data: T) => Promise<{ success: boolean }>;
+  onSubmit: (data: T) => Promise<{
+    success: boolean;
+    error?: { message: string };
+  }>;
   formType: "SIGN_IN" | "SIGN_UP";
 }
 
@@ -53,7 +56,7 @@ export default function AuthForm<T extends FieldValues>({
         formType === "SIGN_IN" ? "Signed in successfully." : "Account created successfully."
       );
     } else {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(result.error?.message ?? "Something went wrong. Please try again.");
     }
   };
 

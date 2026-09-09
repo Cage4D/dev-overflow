@@ -2,8 +2,12 @@ import Link from "next/link"
 import Image from "next/image";
 import Theme from "./theme";
 import MobileNavigation from "./MobileNavigation";
+import { auth } from "@/auth";
+import { headers } from "next/headers";
+import UserAvatar from "@/components/UserAvatar";
 
-export default function Navbar() {
+export default async function Navbar() {
+    const session = await auth.api.getSession({ headers: await headers()})
     return (
         <nav className="flex-between background-light900_dark200 fixed z-50 w-full p-6 shadow-light-300 dark:shadow-none sm:px-12 gap-5"> 
             <Link  
@@ -20,8 +24,11 @@ export default function Navbar() {
                 </p>
             </Link>
             <p>Global Search</p>
-            <div className="flex-between gap-5"><Theme/></div>
-            <MobileNavigation/>
+            <div className="flex-between gap-5">
+                <Theme/>
+                { session?.user?.id && <UserAvatar id={session.user.id} name={session.user.name} imageUrl={session.user?.image}/>}
+                <MobileNavigation/>
+            </div>
         </nav>
     );
 };

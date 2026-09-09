@@ -1,0 +1,45 @@
+"use server";
+
+import { ZodError, type ZodType } from "zod";
+import { UnauthorizedError, ValidationError } from "../http-errors";
+import { auth } from "@/auth";
+import { headers } from "next/headers";
+import dbConnect from "@/lib/mongoose";
+
+type Session = typeof auth.$Infer.Session;
+
+type ActionOptions<T> = {
+    params?: T;
+    schema?: ZodType<T>;
+    authorize?: boolean;
+}
+
+async function action<T>({ params, schema, authorize = false }: ActionOptions<T>) {
+    if (schema && params) {
+        try {
+            schema.parse(params);
+        } catch (err) {
+            if (err instanceof ZodError) {
+                return new ValidationError(
+                    err.flatten().fieldErrors as Record<string, string[]>,
+                );
+            } else {
+                return new Error("Schema validation failed");
+            }
+        }
+    }
+
+    let session: Session | null = null;
+    if (authorize) {
+        session = await auth.api.getSession({ headers: await headers() });
+
+        if (!session) {
+            return new UnauthorizedError();
+        }
+    }
+
+    await dbConnect();
+    return { params, session };
+}
+
+export default action;
