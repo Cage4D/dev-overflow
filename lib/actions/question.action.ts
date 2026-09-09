@@ -189,9 +189,6 @@ export async function getQuestion(
     return handleError(validatedResult) as ErrorResponse;
   }
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   const { questionId } = validatedResult.params!;
   try {
     const question = await Question.findById(questionId).populate("tags");
