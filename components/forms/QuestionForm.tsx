@@ -1,47 +1,87 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useRef, useState, useTransition, type KeyboardEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { AskQuestionSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { z } from "zod";
 import { MDXEditorMethods } from "@mdxeditor/editor";
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 import TagCard from "../cards/TagCard";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
+import { useRouter } from "next/navigation";
+import ROUTES from "@/constants/routes";
 
 type QuestionFormValues = z.infer<typeof AskQuestionSchema>;
 
-const Editor = dynamic(() => import('@/components/editor'), {
+const Editor = dynamic(() => import("@/components/editor"), {
   // Make sure we turn SSR off
-  ssr: false
-})
+  ssr: false,
+});
 
 const MAX_TAGS = 3;
 const MAX_TAG_LENGTH = 15;
 
-export default function QuestionForm() {
+interface Params {
+  question?: Question;
+  isEdit?: boolean;
+}
+
+export default function QuestionForm({ question, isEdit = false }: Params) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const editorRef = useRef<MDXEditorMethods>(null);
   const [tagInput, setTagInput] = useState("");
 
   const form = useForm<QuestionFormValues>({
     resolver: zodResolver(AskQuestionSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      tags: [],
+      title: question?.title || "",
+      content: question?.content || "",
+      tags: question?.tags.map((tag) => tag.name) || [],
     },
   });
 
-  const handleCreateQuestion = (data: QuestionFormValues) => {
-    console.log(data);
-    // TODO: call your server action / API route here
+  const handleCreateQuestion = async (data: QuestionFormValues) => {
+    startTransition(async () => {
+      if (isEdit && question) {
+        const result = await editQuestion({
+          questionId: question?._id,
+          ...data,
+        });
+        if (result.success) {
+          toast.success("Question updated successfully.");
+          if (result.data) router.push(ROUTES.QUESTION(result.data._id));
+        } else {
+          toast.error(
+            `${result.status}: ${result.error?.message || "something went wrong"}`,
+          );
+        }
+        return;
+      }
+      const result = await createQuestion(data);
+
+      if (result.success) {
+        toast.success("Question created successfully.");
+        if (result.data) router.push(ROUTES.QUESTION(result.data._id));
+      } else {
+        toast.error(
+          `${result.status}: ${result.error?.message || "something went wrong"}`,
+        );
+      }
+    });
   };
 
   return (
@@ -55,7 +95,9 @@ export default function QuestionForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="title">Question Title <span className="text-primary-500">*</span></FieldLabel>
+              <FieldLabel htmlFor="title">
+                Question Title <span className="text-primary-500">*</span>
+              </FieldLabel>
               <Input
                 {...field}
                 id="title"
@@ -74,8 +116,15 @@ export default function QuestionForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="content">Detailed Explanation <span className="text-primary-500">*</span></FieldLabel>
-              <Editor value={field.value} editorRef={editorRef} fieldChange={field.onChange}/>
+              <FieldLabel htmlFor="content">
+                Detailed Explanation of your problem{" "}
+                <span className="text-primary-500">*</span>
+              </FieldLabel>
+              <Editor
+                value={field.value}
+                editorRef={editorRef}
+                fieldChange={field.onChange}
+              />
             </Field>
           )}
         />
@@ -92,7 +141,9 @@ export default function QuestionForm() {
               if (!newTag) return;
 
               if (newTag.length > MAX_TAG_LENGTH) {
-                toast.warning(`Tags must be ${MAX_TAG_LENGTH} characters or less.`);
+                toast.warning(
+                  `Tags must be ${MAX_TAG_LENGTH} characters or less.`,
+                );
                 return;
               }
 
@@ -111,12 +162,16 @@ export default function QuestionForm() {
             };
 
             const handleRemoveTag = (tagToRemove: string) => {
-              field.onChange(field.value.filter((tag: string) => tag !== tagToRemove));
+              field.onChange(
+                field.value.filter((tag: string) => tag !== tagToRemove),
+              );
             };
 
             return (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="tags">Tags <span className="text-primary-500">*</span></FieldLabel>
+                <FieldLabel htmlFor="tags">
+                  Tags <span className="text-primary-500">*</span>
+                </FieldLabel>
                 <Input
                   id="tags"
                   value={tagInput}
@@ -147,7 +202,9 @@ export default function QuestionForm() {
                     ))}
                   </div>
                 )}
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             );
           }}
@@ -157,10 +214,17 @@ export default function QuestionForm() {
       <div className="mt-16 flex justify-end">
         <Button
           type="submit"
-          disabled={form.formState.isSubmitting}
+          disabled={isPending}
           className="primary-gradient paragraph-medium min-h-12 rounded-2 px-4 py-3 font-inter text-light-900! w-fit"
         >
-          {form.formState.isSubmitting ? "Submitting..." : "Ask a Question"}
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 size-4 animate-spin aria-hidden:true"></Loader2>
+              <span>Submitting...</span>
+            </>
+          ) : (
+            <>{isEdit ? "Edit" : "Ask a Question"}</>
+          )}
         </Button>
       </div>
     </form>

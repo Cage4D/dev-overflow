@@ -1,6 +1,11 @@
+import { auth } from "@/auth";
 import QuestionForm from "@/components/forms/QuestionForm";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function AskAQuestion() {
+export default async function AskAQuestion() {
+    const session = await auth.api.getSession({ headers: await headers() })
+    if (!session) redirect("/sign-in")
     return (
         <>
             <h1 className="h1-bold text-dark100_light900">
