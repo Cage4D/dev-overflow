@@ -124,7 +124,7 @@ export async function editQuestion(
 
     const newTagDocuments = [];
     if (tagsToAdd.length > 0) {
-      for (const tag of tags) {
+      for (const tag of tagsToAdd) {
         const existingTag = await Tag.findOneAndUpdate(
           { name: { $regex: new RegExp(`^${tag}$`, "i") } },
           { $setOnInsert: { name: tag }, $inc: { questions: 1 } },
@@ -190,6 +190,7 @@ export async function getQuestion(
   }
 
   const { questionId } = validatedResult.params!;
+
   try {
     const question = await Question.findById(questionId).populate("tags");
     if (!question) {
