@@ -7,10 +7,9 @@ import {
   AskQuestionSchema,
   EditQuestionSchema,
   GetQuestionSchema,
+  PaginatedSearchParamsSchema,
 } from "../validations";
-import mongoose from "mongoose";
-import { auth } from "@/auth";
-import { headers } from "next/headers";
+import mongoose, { type QueryFilter } from "mongoose";
 import Tag, { ITagDoc } from "@/database/tag.model";
 import TagQuestion from "@/database/tag-question.model";
 
@@ -182,7 +181,6 @@ export async function getQuestion(
   const validatedResult = await action({
     params,
     schema: GetQuestionSchema,
-    authorize: true,
   });
 
   if (validatedResult instanceof Error) {
@@ -197,6 +195,102 @@ export async function getQuestion(
       throw new Error("Question not found");
     }
     return { success: true, data: JSON.parse(JSON.stringify(question)) };
+  } catch (err) {
+    return handleError(err) as ErrorResponse;
+  }
+}
+
+export async function getQuestions(
+  params: PaginatedSearchParams,
+): Promise<ActionResponse<{ questions: Question[]; isNext: boolean }>> {
+  const validatedResult = await action({
+    params,
+    schema: PaginatedSearchParamsSchema,
+  });
+
+  if (validatedResult instanceof Error) {
+    return handleError(validatedResult) as ErrorResponse;
+  }
+
+  const { page = 1, pageSize = 10, query, filter } = params;
+  const skip = (Number(page) - 1) * pageSize;
+  const limit = Number(pageSize);
+
+  const filterQuery: QueryFilter<typeof Question> = {};
+
+  if (filter === "recommended")
+    return { success: true, data: { questions: [], isNext: false } };
+  if (query) {
+    filterQuery.$or = [
+      { title: { $regex: new RegExp(query, "i") } },
+      { content: { $regex: new RegExp(query, "i") } },
+    ];
+  }
+
+  let sortCriteria = {};
+  switch (filter) {
+    case "newest":
+      sortCriteria = { createdAt: -1 };
+      break;
+    case "oldest":
+      filterQuery.answers = 0;
+      sortCriteria = { createdAt: -1 };
+      break;
+    case "popular":
+      sortCriteria = { upvotes: -1 };
+      break;
+    default:
+      sortCriteria = { createdAt: -1 };
+      break;
+  }
+
+  try {
+    const totalQuestions = await Question.countDocuments(filterQuery);
+
+    const questions = await Question.find(filterQuery)
+      .populate("tags", "name")
+      .lean()
+      .sort(sortCriteria)
+      .skip(skip)
+      .limit(limit);
+
+    const authorIds = [
+      ...new Set(questions.map((question) => question.author)),
+    ];
+
+    const authorObjectIds = authorIds
+      .filter((authorId) => mongoose.Types.ObjectId.isValid(authorId))
+      .map((authorId) => new mongoose.Types.ObjectId(authorId));
+
+    const users = await mongoose.connection
+      .getClient()
+      .db("DevFlow")
+      .collection("user")
+      .find({ _id: { $in: authorObjectIds } })
+      .project({ name: 1, image: 1 })
+      .toArray();
+    const usersById = new Map(users.map((user) => [String(user._id), user]));
+    const questionsWithAuthors = questions.map((question) => {
+      const user = usersById.get(String(question.author));
+      return {
+        ...question,
+        author: {
+          _id: question.author,
+          name: user?.name ?? "Unknown user",
+          image: user?.image ?? "",
+        },
+      };
+    });
+
+    const isNext = totalQuestions > skip + questions.length;
+
+    return {
+      success: true,
+      data: {
+        questions: JSON.parse(JSON.stringify(questionsWithAuthors)),
+        isNext,
+      },
+    };
   } catch (err) {
     return handleError(err) as ErrorResponse;
   }

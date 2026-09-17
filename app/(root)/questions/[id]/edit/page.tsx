@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { getAuth } from "@/auth";
 import QuestionForm from "@/components/forms/QuestionForm";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
@@ -9,7 +9,7 @@ export default async function EditQuestion({ params }: RouteParams) {
   const { id } = await params;
   if (!id) return notFound();
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await (await getAuth()).api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
   const { data: question, success } = await getQuestion({ questionId: id });

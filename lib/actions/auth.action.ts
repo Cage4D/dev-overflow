@@ -4,7 +4,7 @@ import { z } from "zod";
 import action from "../handlers/action";
 import { SignInSchema, SignUpSchema } from "../validations";
 import handleError from "../handlers/error";
-import { auth } from "@/auth";
+import { getAuth } from "@/auth";
 import { headers } from "next/headers"
 
 type AuthCredentials = z.infer<typeof SignUpSchema>;
@@ -19,6 +19,7 @@ export async function signUpWithCredentials(params: AuthCredentials) {
   const { name, username, email, password } = validationResult.params!;
 
   try {
+    const auth = await getAuth();
     await auth.api.signUpEmail({
       headers: await headers(),
       body: { name, email, password, username },
@@ -42,6 +43,7 @@ export async function signInWithCredentials(
   const { email, password } = validationResult.params!;
 
   try {
+    const auth = await getAuth();
     await auth.api.signInEmail({
       headers: await headers(),
       body: { email, password },

@@ -9,13 +9,13 @@ import ROUTES from "@/constants/routes";
 import Image from "next/image";
 import Link from "next/link";
 import NavLinks from "./NavLinks";
-import { auth } from "@/auth";
+import { getAuth } from "@/auth";
 import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 
 export default async function MobileNavigation() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await (await getAuth()).api.getSession({ headers: await headers() });
   const userId = session?.user?.id;
   return (
     <Sheet>
@@ -53,6 +53,7 @@ export default async function MobileNavigation() {
               <form
                 action={async () => {
                   "use server";
+                  const auth = await getAuth();
                   await auth.api.signOut({ headers: await headers() });
                 }}
               >

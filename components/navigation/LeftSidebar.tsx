@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import ROUTES from "@/constants/routes";
 import Link from "next/link";
 import Image from "next/image";
-import { auth } from "@/auth";
+import { getAuth } from "@/auth";
 import { headers } from "next/headers";
 import { LogOut } from "lucide-react";
 
 export default async function LeftSidebar() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await (await getAuth()).api.getSession({ headers: await headers() });
   const userId = session?.user?.id;
   return (
     <section className="custom-scrollbar background-light900_dark200 light-border sticky left-0 top-0 h-screen flex flex-col justify-between overflow-y-auto border-r p-6 pt-36 shadow-light-300 dark:shadow-none max-sm:hidden lg:w-66.5">
@@ -21,6 +21,7 @@ export default async function LeftSidebar() {
           <form
             action={async () => {
               "use server";
+              const auth = await getAuth();
               await auth.api.signOut({ headers: await headers() });
             }}
           >

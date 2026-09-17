@@ -2,11 +2,9 @@
 
 import { ZodError, type ZodType } from "zod";
 import { UnauthorizedError, ValidationError } from "../http-errors";
-import { auth } from "@/auth";
+import { getAuth, type Session } from "@/auth";
 import { headers } from "next/headers";
 import dbConnect from "@/lib/mongoose";
-
-type Session = typeof auth.$Infer.Session;
 
 type ActionOptions<T> = {
     params?: T;
@@ -31,6 +29,7 @@ async function action<T>({ params, schema, authorize = false }: ActionOptions<T>
 
     let session: Session | null = null;
     if (authorize) {
+        const auth = await getAuth();
         session = await auth.api.getSession({ headers: await headers() });
 
         if (!session) {

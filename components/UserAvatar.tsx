@@ -4,10 +4,12 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import Image from "next/image";
 
 interface AvatarProps {
-    id: string;
+    id?: string;
     name: string;
     imageUrl?: string | null;
     className?: string;
+    size?: number;
+    href?: string | null;
 }
 
 export default function UserAvatar({
@@ -15,18 +17,20 @@ export default function UserAvatar({
   name,
   imageUrl,
   className = "h-9 w-9",
+  size = 36,
+  href
 }: AvatarProps) {
     const initials = name.split(" ").map((word: string) => word[0]).join("").toUpperCase().slice(0, 2)
-  return (
-    <Link href={ROUTES.PROFILE(id)}>
+    const targetHref = href ?? (id ? ROUTES.PROFILE(id) : null)
+    const avatar = (
       <Avatar className={className}>
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={name}
             className="object-cover"
-            width={36}
-            height={36}
+            width={size}
+            height={size}
             quality={100}
           />
         ) : (
@@ -35,6 +39,6 @@ export default function UserAvatar({
           </AvatarFallback>
         )}
       </Avatar>
-    </Link>
-  );
+    )
+    return targetHref ? <Link href={targetHref}>{avatar}</Link> : avatar;
 }

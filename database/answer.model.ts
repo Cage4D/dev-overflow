@@ -1,7 +1,7 @@
 import { model, models, Schema, Types } from "mongoose";
 
 export interface IAnswer {
-  author: Types.ObjectId;
+  author: string;
   question: Types.ObjectId;
   content: string;
   upvotes: number;
@@ -10,7 +10,7 @@ export interface IAnswer {
 
 const AnswerSchema = new Schema<IAnswer>(
   {
-    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    author: { type: String, required: true },
     question: { type: Schema.Types.ObjectId, ref: "Question", required: true },
     content: { type: String, required: true },
     upvotes: { type: Number, default: 0 },

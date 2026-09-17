@@ -1,7 +1,7 @@
 import { model, models, Schema, Types } from "mongoose";
 
 export interface IInteraction {
-  user: Types.ObjectId;
+  user: string;
   action: string;
   actionId: Types.ObjectId;
   actionType: "question" | "answer";
@@ -9,7 +9,7 @@ export interface IInteraction {
 
 const InteractionSchema = new Schema<IInteraction>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    user: { type: String, required: true },
     action: { type: String, required: true },
     actionId: { type: Schema.Types.ObjectId, required: true },
     actionType: { type: String, enum: ["question", "answer"], required: true },

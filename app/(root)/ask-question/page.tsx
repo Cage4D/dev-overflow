@@ -1,10 +1,10 @@
-import { auth } from "@/auth";
+import { getAuth } from "@/auth";
 import QuestionForm from "@/components/forms/QuestionForm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function AskAQuestion() {
-    const session = await auth.api.getSession({ headers: await headers() })
+    const session = await (await getAuth()).api.getSession({ headers: await headers() })
     if (!session) redirect("/sign-in")
     return (
         <>
