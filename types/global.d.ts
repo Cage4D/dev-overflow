@@ -84,3 +84,7 @@ interface PaginatedSearchParams {
   filter?: string;
   sort?: string;
 }
+
+interface GetTagQuestionsParams extends Omit<PaginatedSearchParams, "filter"> {
+  tagId: string;
+}
