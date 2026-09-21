@@ -13,7 +13,6 @@ export default async function QuestionDetails({ params }: RouteParams) {
   const { success, data: question } = await getQuestion({ questionId: id }) 
   if (!success || !question) redirect("/404")
   const { author, createdAt, answers, views, tags, content, title } = question;
-  console.log(author.name)
   return (
     <>
       <div className="flex-start w-full flex-col">
