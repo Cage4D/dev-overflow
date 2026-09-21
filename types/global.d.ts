@@ -30,6 +30,7 @@ interface Metric {
   textStyles: string;
   imgStyles?: string;
   isAuthor?: boolean;
+  titleStyles?: string;
 }
 
 interface SignInWithOAuthParams {

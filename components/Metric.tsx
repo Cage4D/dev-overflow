@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import UserAvatar from "./UserAvatar";
+import { cn } from "@/lib/utils";
 
 export default function Metric({
   imgUrl,
@@ -11,6 +12,7 @@ export default function Metric({
   textStyles,
   imgStyles,
   isAuthor,
+  titleStyles,
 }: Metric) {
   const metricContent = (
     <>
@@ -32,11 +34,13 @@ export default function Metric({
       )}
       <p className={`${textStyles} flex items-center gap-1`}>
         {value}
-        <span
-          className={`small-regular line-clamp-1 ${isAuthor ? "max-sm:hidden" : ""}`}
+        { title ? (
+          <span
+          className={cn(`small-regular line-clamp-1`, titleStyles)}
         >
           {title}
         </span>
+        ) : null}
       </p>
     </>
   );

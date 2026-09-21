@@ -194,7 +194,29 @@ export async function getQuestion(
     if (!question) {
       throw new Error("Question not found");
     }
-    return { success: true, data: JSON.parse(JSON.stringify(question)) };
+
+    const authorId = question.author;
+    const user = mongoose.Types.ObjectId.isValid(authorId)
+      ? await mongoose.connection
+          .getClient()
+          .db("DevFlow")
+          .collection("user")
+          .findOne({ _id: new mongoose.Types.ObjectId(authorId) })
+      : null;
+
+    const questionData = JSON.parse(JSON.stringify(question));
+
+    return {
+      success: true,
+      data: {
+        ...questionData,
+        author: {
+          _id: authorId,
+          name: user?.name ?? "Unknown user",
+          image: user?.image ?? "",
+        },
+      },
+    };
   } catch (err) {
     return handleError(err) as ErrorResponse;
   }
