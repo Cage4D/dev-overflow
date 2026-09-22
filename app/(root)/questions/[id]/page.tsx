@@ -3,21 +3,38 @@ import Preview from "@/components/editor/Preview";
 import AnswerForm from "@/components/forms/AnswerForm";
 import Metric from "@/components/Metric";
 import UserAvatar from "@/components/UserAvatar";
+import VoteButtons from "@/components/VoteButtons";
+import SaveQuestionButton from "@/components/SaveQuestionButton";
+import AnswersList from "@/components/AnswersList";
 import ROUTES from "@/constants/routes";
 import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
+import { hasVoted } from "@/lib/actions/vote.action";
+import { getAuth } from "@/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 
 export default async function QuestionDetails({ params }: RouteParams) {
   const { id } = await params;
-  const { success, data: question } = await getQuestion({ questionId: id }) 
-  if (!success || !question) redirect("/404")
+  const { success, data: question } = await getQuestion({ questionId: id });
+  if (!success || !question) redirect("/404");
+
   const { author, createdAt, answers, views, tags, content, title } = question;
+
+  const session = await (await getAuth()).api.getSession({ headers: await headers() });
+  const currentUserId = session?.user?.id;
+
+  const voteResult = currentUserId
+    ? await hasVoted({ targetId: id, targetType: "question" })
+    : null;
+  const questionVotes = voteResult?.data;
+
   after(async () => {
     await incrementViews({ questionId: id });
   });
+
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -35,8 +52,16 @@ export default async function QuestionDetails({ params }: RouteParams) {
               </p>
             </Link>
           </div>
-          <div className="flex justify-end">
-            <p>Votes</p>
+          <div className="flex items-center justify-end gap-2">
+            <SaveQuestionButton questionId={id} />
+            <VoteButtons
+              targetType="question"
+              targetId={id}
+              upvotes={question.upvotes}
+              downvotes={question.downvotes}
+              hasUpvoted={questionVotes?.hasUpvoted}
+              hasDownvoted={questionVotes?.hasDownvoted}
+            />
           </div>
         </div>
         <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full">
@@ -67,15 +92,16 @@ export default async function QuestionDetails({ params }: RouteParams) {
           textStyles="small-regular text-dark400_light700"
         />
       </div>
-      <Preview content={content}/>
+      <Preview content={content} />
       <div className="mt-8 flex flex-wrap gap-2">
         {tags.map((tag: Tag) => (
-            <TagCard key={tag._id} _id={tag._id as string} name={tag.name} compact/>
+          <TagCard key={tag._id} _id={tag._id as string} name={tag.name} compact />
         ))}
       </div>
       <section className="my-5">
         <AnswerForm questionId={id} />
       </section>
+      <AnswersList questionId={id} />
     </>
   );
 }
