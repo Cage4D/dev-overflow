@@ -61,8 +61,13 @@ interface CreateQuestionParams {
     tags: string[]
 }
 
-interface EditProfileParams extends UserParams {
+interface EditProfileParams {
   userId: string;
+  name: string;
+  username: string;
+  bio?: string;
+  image?: string;
+  portfolio?: string;
 }
 
 interface UserParams {
@@ -165,6 +170,14 @@ interface PaginatedSearchParams {
 interface GetTagQuestionsParams extends Omit<PaginatedSearchParams, "filter"> {
   tagId: string;
 }
+interface GetUserQuestionsParams extends PaginatedSearchParams {
+  userId: string;
+}
+
+interface GetUserAnswersParams extends PaginatedSearchParams {
+  userId: string;
+}
+
 
 interface IncrementViewsParams {
   questionId: string;

@@ -7,6 +7,7 @@ import {
   AskQuestionSchema,
   EditQuestionSchema,
   GetQuestionSchema,
+  GetUserQuestionsSchema,
   IncrementViewsSchema,
   PaginatedSearchParamsSchema,
 } from "../validations";
@@ -360,3 +361,60 @@ export async function getHotQuestions(): Promise<ActionResponse<Question[]>> {
     return handleError(err) as ErrorResponse;
   }
 }
+
+export async function getUserQuestions(
+  params: GetUserQuestionsParams,
+): Promise<ActionResponse<{ questions: Question[]; isNext: boolean }>> {
+  const validatedResult = await action({
+    params,
+    schema: GetUserQuestionsSchema,
+  });
+
+  if (validatedResult instanceof Error) {
+    return handleError(validatedResult) as ErrorResponse;
+  }
+
+  const { userId, page = 1, pageSize = 5 } = validatedResult.params!;
+  const skip = (Number(page) - 1) * pageSize;
+  const limit = Number(pageSize);
+
+  try {
+    const filterQuery: QueryFilter<typeof Question> = { author: userId };
+    const totalQuestions = await Question.countDocuments(filterQuery);
+
+    const questions = await Question.find(filterQuery)
+      .populate("tags", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const authorIds = [...new Set(questions.map((q) => q.author))];
+    const user = await mongoose.connection
+      .getClient()
+      .db("DevFlow")
+      .collection("user")
+      .findOne({ _id: new mongoose.Types.ObjectId(userId) });
+
+    const questionsWithAuthor = questions.map((question) => ({
+      ...question,
+      author: {
+        _id: userId,
+        name: user?.name ?? "Unknown user",
+        image: user?.image ?? "",
+      },
+    }));
+
+    const isNext = totalQuestions > skip + questions.length;
+    return {
+      success: true,
+      data: {
+        questions: JSON.parse(JSON.stringify(questionsWithAuthor)),
+        isNext,
+      },
+    };
+  } catch (err) {
+    return handleError(err) as ErrorResponse;
+  }
+}
+

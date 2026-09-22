@@ -7,6 +7,7 @@ import {
   CreateAnswerSchema,
   DeleteAnswerSchema,
   GetAnswersSchema,
+  GetUserAnswersSchema,
 } from "../validations";
 import Answer from "@/database/answer.model";
 import Question from "@/database/question.model";
@@ -169,3 +170,50 @@ export async function deleteAnswer(
     return handleError(err) as ErrorResponse;
   }
 }
+
+export async function getUserAnswers(
+  params: GetUserAnswersParams,
+): Promise<ActionResponse<{ answers: (Answer & { questionId: string })[], isNext: boolean }>> {
+  const validatedResult = await action({
+    params,
+    schema: GetUserAnswersSchema,
+  });
+
+  if (validatedResult instanceof Error) {
+    return handleError(validatedResult) as ErrorResponse;
+  }
+
+  const { userId, page = 1, pageSize = 5 } = validatedResult.params!;
+  const skip = (Number(page) - 1) * pageSize;
+  const limit = Number(pageSize);
+
+  try {
+    const filterQuery: { author: string } = { author: userId };
+    const totalAnswers = await Answer.countDocuments(filterQuery);
+
+    const answers = await Answer.find(filterQuery)
+      .select("content upvotes downvotes author createdAt question")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const answersWithData = answers.map((answer) => ({
+      ...answer,
+      author: { _id: userId, name: "You", image: "" },
+      questionId: String(answer.question as unknown as mongoose.Types.ObjectId),
+    }));
+
+    const isNext = totalAnswers > skip + answers.length;
+    return {
+      success: true,
+      data: {
+        answers: JSON.parse(JSON.stringify(answersWithData)),
+        isNext,
+      },
+    };
+  } catch (err) {
+    return handleError(err) as ErrorResponse;
+  }
+}
+
