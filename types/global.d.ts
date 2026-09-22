@@ -60,6 +60,36 @@ interface CreateQuestionParams {
     tags: string[]
 }
 
+interface EditProfileParams extends UserParams {
+  userId: string;
+}
+
+interface UserParams {
+  name: string;
+  username: string;
+  email: string;
+  bio?: string;
+  image?: string;
+  portfolio?: string;
+}
+
+interface UserIdParams {
+  userId: string;
+}
+
+interface UserWithStats {
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+  image?: string;
+  bio?: string;
+  portfolio?: string;
+  questions: number;
+  answers: number;
+  saves: number;
+}
+
 interface EditQuestionParams extends CreateQuestionParams {
   questionId: string;
 }
@@ -82,6 +112,11 @@ interface CreateAnswerParams {
   questionId: string;
   content: string;
 }
+
+interface SaveQuestionParams {
+  questionId: string;
+}
+
 
 interface ToggleVoteParams {
   targetId: string;

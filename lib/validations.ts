@@ -135,3 +135,23 @@ export const HasVotedSchema = z.object({
   targetId: z.string().min(1, "Target ID is required."),
   targetType: z.enum(["question", "answer"]),
 });
+
+
+export const SaveQuestionSchema = z.object({
+  questionId: z.string().min(1, "Question ID is required."),
+});
+
+
+export const EditProfileSchema = z.object({
+  userId: z.string().min(1, "User ID is required."),
+  name: z.string().min(1, "Name is required").max(50),
+  username: z.string().min(3, "Username must be at least 3 characters long").max(30),
+  bio: z.string().optional(),
+  image: z.string().optional(),
+  portfolio: z.string().optional(),
+});
+
+
+export const GetUserIdParamsSchema = z.object({
+  userId: z.string().min(1, "User ID is required."),
+});
