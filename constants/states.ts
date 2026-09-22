@@ -47,3 +47,17 @@ export const EMPTY_COLLECTIONS = {
     href: ROUTES.COLLECTION,
   },
 };
+
+export const EMPTY_USER = {
+  title: "No Users Found",
+  message: "The community is still quiet. Be the first to join in!",
+  button: {
+    text: "Sign up",
+    href: ROUTES.SIGN_UP,
+  },
+};
+
+export const EMPTY_ANSWERS = {
+  title: "No Answers Yet",
+  message: "This question is still waiting for its first answer.",
+};
