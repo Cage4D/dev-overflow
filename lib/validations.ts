@@ -124,3 +124,14 @@ export const AnswerSchema = z.object({
 export const CreateAnswerSchema = AnswerSchema.extend({
   questionId: z.string().min(1, "Question ID is required.")
 })
+
+export const ToggleVoteSchema = z.object({
+  targetId: z.string().min(1, "Target ID is required."),
+  targetType: z.enum(["question", "answer"]),
+  voteType: z.enum(["upvote", "downvote"]),
+});
+
+export const HasVotedSchema = z.object({
+  targetId: z.string().min(1, "Target ID is required."),
+  targetType: z.enum(["question", "answer"]),
+});

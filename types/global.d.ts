@@ -83,6 +83,24 @@ interface CreateAnswerParams {
   content: string;
 }
 
+interface ToggleVoteParams {
+  targetId: string;
+  targetType: "question" | "answer";
+  voteType: "upvote" | "downvote";
+}
+
+interface HasVotedParams {
+  targetId: string;
+  targetType: "question" | "answer";
+}
+
+interface VoteResponse {
+  upvotes: number;
+  downvotes: number;
+  hasUpvoted: boolean;
+  hasDownvoted: boolean;
+}
+
 interface Answer {
   _id: string;
   author: Author;
