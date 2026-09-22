@@ -31,8 +31,8 @@ export default async function Profile({
   const questionsResult = await getUserQuestions({ userId: id, page: 1, pageSize: 5 });
   const answersResult = await getUserAnswers({ userId: id, page: 1, pageSize: 5 });
 
-  const { questions, isNext: isNextQuestions } = questionsResult.data || {};
-  const { answers, isNext: isNextAnswers } = answersResult.data || {};
+  const { questions } = questionsResult.data || {};
+  const { answers } = answersResult.data || {};
 
   return (
     <>
