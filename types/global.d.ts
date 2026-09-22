@@ -187,3 +187,7 @@ interface IncrementViewsParams {
 interface DeleteQuestionParams {
   questionId: string;
 }
+
+interface GenerateAnswerParams {
+  questionId: string;
+}

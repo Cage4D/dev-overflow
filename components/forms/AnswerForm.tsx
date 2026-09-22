@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import type { z } from "zod";
 import dynamic from "next/dynamic";
+import type { MDXEditorMethods } from "@mdxeditor/editor";
 import { createAnswer } from "@/lib/actions/answer.action";
+import { generateAIAnswer } from "@/lib/ai/generate";
 import Image from "next/image";
 
 type AnswerFormValues = z.infer<typeof AnswerSchema>;
@@ -26,7 +28,9 @@ interface Params {
 
 export default function AnswerForm({ questionId }: Params) {
   const [isPending, startTransition] = useTransition();
+  const [isGenerating, generateTransition] = useTransition();
   const [editorKey, setEditorKey] = useState(0);
+  const editorRef = useRef<MDXEditorMethods>(null);
 
   const form = useForm<AnswerFormValues>({
     resolver: zodResolver(AnswerSchema),
@@ -42,6 +46,7 @@ export default function AnswerForm({ questionId }: Params) {
       if (result.success) {
         toast.success("Answer submitted successfully.");
         form.reset();
+        editorRef.current?.setMarkdown("");
         setEditorKey((key) => key + 1);
       } else {
         toast.error(
@@ -51,9 +56,26 @@ export default function AnswerForm({ questionId }: Params) {
     });
   };
 
+  const handleAIAnswer = () => {
+    if (isGenerating) return;
+    generateTransition(async () => {
+      const result = await generateAIAnswer({ questionId });
+
+      if (result.success && result.data) {
+        const content = result.data.content;
+        form.setValue("content", content, { shouldValidate: true });
+        editorRef.current?.setMarkdown(content);
+        toast.success("AI answer generated. Review and edit before submitting.");
+      } else {
+        toast.error(result.error?.message || "Something went wrong");
+      }
+    });
+  };
+
   return (
     <form
       className="flex w-full flex-col gap-10"
+      // eslint-disable-next-line react-hooks/refs -- react-hook-form handleSubmit is a submit-time callback
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <FieldGroup>
@@ -68,17 +90,22 @@ export default function AnswerForm({ questionId }: Params) {
                 </h4>
                 <Button
                   type="button"
-                  disabled
+                  onClick={handleAIAnswer}
+                  disabled={isGenerating}
                   className="btn light-border-2 gap-1.5 rounded-md border px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500"
                 >
-                  <Image
-                    src="/icons/stars.svg"
-                    alt="Generate AI answer"
-                    width={12}
-                    height={12}
-                    className="object-contain"
-                  />
-                  Generate AI answer
+                  {isGenerating ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Image
+                      src="/icons/stars.svg"
+                      alt="Generate AI answer"
+                      width={12}
+                      height={12}
+                      className="object-contain"
+                    />
+                  )}
+                  {isGenerating ? "Generating..." : "Generate AI answer"}
                 </Button>
               </div>
               <FieldLabel htmlFor="content" className="sr-only">
@@ -87,7 +114,7 @@ export default function AnswerForm({ questionId }: Params) {
               <Editor
                 key={editorKey}
                 value={field.value}
-                editorRef={null}
+                editorRef={editorRef}
                 fieldChange={field.onChange}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
