@@ -1,6 +1,7 @@
 import { model, models, Schema, Types } from "mongoose";
 
 export interface IQuestion {
+  _id: string;
   title: string;
   content: string;
   tags: Types.ObjectId[];
