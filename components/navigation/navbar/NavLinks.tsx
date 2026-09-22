@@ -60,7 +60,7 @@ export default function NavLinks({
         );
 
         return isMobileNav ? (
-          <SheetClose key={route} render={LinkComponent} />
+          <SheetClose key={route} render={LinkComponent} nativeButton={false} />
         ) : (
           <React.Fragment key={route}>{LinkComponent}</React.Fragment>
         );
