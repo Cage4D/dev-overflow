@@ -113,6 +113,14 @@ interface CreateAnswerParams {
   content: string;
 }
 
+interface GetAnswersParams extends PaginatedSearchParams {
+  questionId: string;
+}
+
+interface DeleteAnswerParams {
+  answerId: string;
+}
+
 interface SaveQuestionParams {
   questionId: string;
 }

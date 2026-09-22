@@ -347,3 +347,16 @@ export async function incrementViews(params: IncrementViewsParams): Promise<Acti
     return handleError(err) as ErrorResponse
   }
 }
+
+export async function getHotQuestions(): Promise<ActionResponse<Question[]>> {
+  try {
+    const questions = await Question.find()
+      .sort({ upvotes: -1, views: -1 })
+      .limit(5)
+      .select("title")
+      .lean();
+    return { success: true, data: JSON.parse(JSON.stringify(questions)) };
+  } catch (err) {
+    return handleError(err) as ErrorResponse;
+  }
+}

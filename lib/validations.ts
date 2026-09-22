@@ -155,3 +155,11 @@ export const EditProfileSchema = z.object({
 export const GetUserIdParamsSchema = z.object({
   userId: z.string().min(1, "User ID is required."),
 });
+
+export const GetAnswersSchema = PaginatedSearchParamsSchema.extend({
+  questionId: z.string().min(1, "Question ID is required.")
+});
+
+export const DeleteAnswerSchema = z.object({
+  answerId: z.string().min(1, "Answer ID is required.")
+});
