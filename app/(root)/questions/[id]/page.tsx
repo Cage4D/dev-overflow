@@ -6,6 +6,7 @@ import UserAvatar from "@/components/UserAvatar";
 import VoteButtons from "@/components/VoteButtons";
 import SaveQuestionButton from "@/components/SaveQuestionButton";
 import AnswersList from "@/components/AnswersList";
+import DeleteQuestionButton from "@/components/DeleteQuestionButton";
 import ROUTES from "@/constants/routes";
 import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
@@ -13,6 +14,7 @@ import { hasVoted } from "@/lib/actions/vote.action";
 import { getAuth } from "@/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 
@@ -53,6 +55,14 @@ export default async function QuestionDetails({ params }: RouteParams) {
             </Link>
           </div>
           <div className="flex items-center justify-end gap-2">
+            {currentUserId === author._id && (
+              <>
+                <Link href={`/questions/${id}/edit`} aria-label="Edit question">
+                  <Image src="/icons/edit.svg" alt="Edit" width={16} height={16} className="invert-0 dark:invert" />
+                </Link>
+                <DeleteQuestionButton questionId={id} />
+              </>
+            )}
             <SaveQuestionButton questionId={id} />
             <VoteButtons
               targetType="question"

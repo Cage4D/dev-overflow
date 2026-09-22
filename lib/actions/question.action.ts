@@ -5,6 +5,7 @@ import action from "../handlers/action";
 import handleError from "../handlers/error";
 import {
   AskQuestionSchema,
+  DeleteQuestionSchema,
   EditQuestionSchema,
   GetQuestionSchema,
   GetUserQuestionsSchema,
@@ -413,6 +414,40 @@ export async function getUserQuestions(
         isNext,
       },
     };
+  } catch (err) {
+    return handleError(err) as ErrorResponse;
+  }
+}
+
+export async function deleteQuestion(
+  params: DeleteQuestionParams,
+): Promise<ActionResponse<{ success: boolean }>> {
+  const validatedResult = await action({
+    params,
+    schema: DeleteQuestionSchema,
+    authorize: true,
+  });
+
+  if (validatedResult instanceof Error) {
+    return handleError(validatedResult) as ErrorResponse;
+  }
+
+  const { questionId } = validatedResult.params!;
+  const userId = validatedResult?.session?.user?.id;
+
+  try {
+    const question = await Question.findById(questionId);
+    if (!question) {
+      throw new Error("Question not found");
+    }
+    if (question.author.toString() !== userId) {
+      throw new Error("Unauthorized");
+    }
+
+    await Question.findByIdAndDelete(questionId);
+    await TagQuestion.deleteMany({ question: questionId });
+
+    return { success: true, data: { success: true } };
   } catch (err) {
     return handleError(err) as ErrorResponse;
   }

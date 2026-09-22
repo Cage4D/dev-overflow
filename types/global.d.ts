@@ -183,3 +183,7 @@ interface GetUserAnswersParams extends PaginatedSearchParams {
 interface IncrementViewsParams {
   questionId: string;
 }
+
+interface DeleteQuestionParams {
+  questionId: string;
+}
