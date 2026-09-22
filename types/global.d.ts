@@ -78,6 +78,20 @@ interface GetQuestionParams {
   questionId: string;
 }
 
+interface CreateAnswerParams {
+  questionId: string;
+  content: string;
+}
+
+interface Answer {
+  _id: string;
+  author: Author;
+  content: string;
+  upvotes: number;
+  downvotes: number;
+  createdAt: Date;
+}
+
 interface PaginatedSearchParams {
   page?: number;
   pageSize?: number;
@@ -88,4 +102,8 @@ interface PaginatedSearchParams {
 
 interface GetTagQuestionsParams extends Omit<PaginatedSearchParams, "filter"> {
   tagId: string;
+}
+
+interface IncrementViewsParams {
+  questionId: string;
 }

@@ -1,9 +1,10 @@
 import TagCard from "@/components/cards/TagCard";
 import Preview from "@/components/editor/Preview";
+import AnswerForm from "@/components/forms/AnswerForm";
 import Metric from "@/components/Metric";
 import UserAvatar from "@/components/UserAvatar";
 import ROUTES from "@/constants/routes";
-import { getQuestion } from "@/lib/actions/question.action";
+import { getQuestion, incrementViews } from "@/lib/actions/question.action";
 import { formatNumber, getTimeStamp } from "@/lib/utils";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -13,6 +14,8 @@ export default async function QuestionDetails({ params }: RouteParams) {
   const { success, data: question } = await getQuestion({ questionId: id }) 
   if (!success || !question) redirect("/404")
   const { author, createdAt, answers, views, tags, content, title } = question;
+  const viewsResult = await incrementViews({ questionId: id });
+  const currentViews = viewsResult.success ? viewsResult.data?.views ?? views : views;
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -57,7 +60,7 @@ export default async function QuestionDetails({ params }: RouteParams) {
         <Metric
           imgUrl="/icons/eye.svg"
           alt="eye icon"
-          value={formatNumber(views)}
+          value={formatNumber(currentViews)}
           title=""
           textStyles="small-regular text-dark400_light700"
         />
@@ -68,6 +71,9 @@ export default async function QuestionDetails({ params }: RouteParams) {
             <TagCard key={tag._id} _id={tag._id as string} name={tag.name} compact/>
         ))}
       </div>
+      <section className="my-5">
+        <AnswerForm questionId={id} />
+      </section>
     </>
   );
 }
