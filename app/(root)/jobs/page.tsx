@@ -1,18 +1,21 @@
 import Image from "next/image";
-import LocalSearch from "@/components/search/LocalSearch";
 import ROUTES from "@/constants/routes";
+import { Suspense } from "react";
+import LocalSearch from "@/components/search/LocalSearch";
 
 export default function FindJobs() {
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">Find Jobs</h1>
       <section className="mt-11">
-        <LocalSearch
-          route={ROUTES.JOBS}
-          imgSrc="/icons/search.svg"
-          placeholder="Search for remote friendly jobs..."
-          otherClasses="flex-1"
-        />
+        <Suspense fallback={null}>
+          <LocalSearch
+            route={ROUTES.JOBS}
+            imgSrc="/icons/search.svg"
+            placeholder="Search for remote friendly jobs..."
+            otherClasses="flex-1"
+          />
+        </Suspense>
       </section>
 
       <section className="background-light900_dark200 light-border mt-10 flex flex-col items-center gap-6 rounded-2xl border p-12 text-center">
