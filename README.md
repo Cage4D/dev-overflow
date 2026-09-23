@@ -1,8 +1,8 @@
 # DevFlow ✦ A Place Where Developers Help Each Other
 
-> "I asked the internet, and the internet answered." — this project, basically.
+> "I asked the internet, and the internet answered." This project, basically.
 
-DevFlow is a full-stack Stack Overflow-style community built with **Next.js**, where developers can ask questions, post answers, upvote useful stuff, save things for later, and browse a community of actual humans (well, and their embarrassing bootcamp-era questions — we've all been there).
+DevFlow is a full-stack Stack Overflow-style community built with **Next.js**, where developers can ask questions, post answers, upvote useful stuff, save things for later, and browse a community of actual humans (well, and their embarrassing bootcamp-era questions. We've all been there.).
 
 It's got everything you'd expect from a Q&A platform, plus one fun twist: **you can hit a button and let OpenAI draft an answer for you.** Your own private rubber duck, minus the existential crisis.
 
@@ -11,15 +11,15 @@ It's got everything you'd expect from a Q&A platform, plus one fun twist: **you 
 ## 🚀 What Can You Actually Do Here?
 
 - **Ask questions** with a rich Markdown editor, and tag them so the right people find them.
-- **Answer questions** — again with the nice editor — or tap **"Generate AI answer"** and get a Markdown draft from GPT-4o-mini to edit and submit.
+- **Answer questions** with the nice editor, or tap **"Generate AI answer"** and get a Markdown draft from GPT-4o-mini to edit and submit.
 - **Vote.** Upvote what saved your afternoon, downvote what cost you an evening. Classic.
 - **Save questions** to your Collection so you can find them when you actually need them.
 - **Search and filter** the question feed (newest / popular / unanswered…), with pagination because nobody needs 9,000 results on one screen.
 - **Visit the Community** page to ogle your future competitors, and check out any user's profile to see how smart they *really* are.
 - **Browse by tag**, because sometimes you just want to look at `javascript` posts like it's a zoo.
-- **Log in** the easy way — email + password, or with your GitHub / Google account.
+- **Log in** the easy way: email + password, or with your GitHub / Google account.
 
-## 🔧 Tech Stack — The People's Choices
+## 🔧 Tech Stack (The People's Choices)
 
 | What | Which |
 |---|---|
@@ -39,13 +39,13 @@ It's got everything you'd expect from a Q&A platform, plus one fun twist: **you 
 
 ### 1. Prerequisites
 
-- **Node.js** 18+ (the repo was built against Node 24 on Windows — but any recent one works).
+- **Node.js** 18+ (the repo was built against Node 24 on Windows, but any recent one works).
 - A **MongoDB** database. This project points at an **Atlas** cluster; any MongoDB (including a local one) works if you give it a connection string.
 - An **OpenAI API key** if you want the AI answer button to actually answer.
 
 ### 2. Environment Variables
 
-Copy the shape below into a local `.env`. **`.env` is gitignored** — your secrets stay yours, this file won't end up in the repo.
+Copy the shape below into a local `.env`. **`.env` is gitignored**, so your secrets stay yours. This file won't end up in the repo.
 
 ```env
 MONGODB_URI="mongodb+srv://<user>:<pass>@<cluster>/?retryWrites=true&w=majority"
@@ -60,7 +60,7 @@ GOOGLE_CLIENT_SECRET=""
 OPENAI_API_KEY=""
 ```
 
-> **Tip:** `OPENAI_API_KEY` can start empty. The AI button will then politely tell you it's not configured instead of crashing — no explosions.
+> **Tip:** `OPENAI_API_KEY` can start empty. The AI button will then politely tell you it's not configured instead of crashing. No explosions.
 
 ### 3. Install & Run
 
@@ -88,7 +88,7 @@ npx tsc --noEmit   # TypeScript check
 ```
 app/            Next.js pages. (auth) = sign-in/sign-up screens,
                 (root) = the main app shell (nav + sidebars + content).
-components/     UI pieces — cards, forms, buttons, sidebars, the editor.
+components/     UI pieces (cards, forms, buttons, sidebars, the editor).
 database/       Mongoose models (Question, Answer, Vote, Tag, …).
 lib/            The engine room:
                 ├── actions/   server actions (the "API" of this app)
@@ -115,7 +115,7 @@ Every action follows the same rhythm:
 2. If `authorize: true`, make sure there's a signed-in session.
 3. Go talk to Mongo.
 4. Return a consistent shape:
-   `{ success: true, data: … }` — or — `{ success: false, status, error: { message } }`.
+   `{ success: true, data: … }` or `{ success: false, status, error: { message } }`.
 
 So a page like the **home feed** is really just: *grab the URL query → call `getQuestions` → render `QuestionCard`s.*
 
@@ -153,7 +153,7 @@ Annoying? Slightly. But it's why signing up with Google "just works."
 
 ## ⚠️ Things That Will Trip You Up
 
-1. **Schema changes need a server restart.** Mongoose registers a model *once per process*. If you edit `database/question.model.ts`, hot reload won't pick it up — stop `npm run dev` and start it again. (Trust us, we lost an afternoon to this one.)
+1. **Schema changes need a server restart.** Mongoose registers a model *once per process*. If you edit `database/question.model.ts`, hot reload won't pick it up. Stop `npm run dev` and start it again. (Trust us, we lost an afternoon to this one.)
 2. **`.env` changes also need a restart.**
 3. **The `author` field stores an ObjectId, not a string.** The model declares it as `Schema.Types.ObjectId` on purpose, so Mongoose casts your string user-id into an ObjectId when querying. If you ever "simplify" it back to `String`, the profile page will quietly show **0 questions** for everyone. Don't be that person.
 4. **The repo files are CRLF.** If you edit with scripts, write `\r\n` or git will show you a diff for every single line. Use `git diff -w` to see *actual* changes.
@@ -173,7 +173,7 @@ Annoying? Slightly. But it's why signing up with Google "just works."
 
 ---
 
-## 🧭 "I Want to Change X" — Quick Map
+## 🧭 "I Want to Change X": A Quick Map
 
 - **Homepage behavior** → `app/(root)/page.tsx` + `getQuestions` in `lib/actions/question.action.ts`
 - **Add a field to questions** → `database/question.model.ts` + `components/cards/QuestionCard.tsx`
@@ -186,6 +186,6 @@ Annoying? Slightly. But it's why signing up with Google "just works."
 
 ## 🎤 Why It Exists
 
-Because someone out there asked, *"but where do I put the `useEffect`?"* — and the answer deserved to live somewhere searchable, with upvotes, for the rest of time. DevFlow is that somewhere.
+Because someone out there asked, *"but where do I put the `useEffect`?"*. The answer deserved to live somewhere searchable, with upvotes, for the rest of time. DevFlow is that somewhere.
 
 Happy shipping. Ask good questions, write better answers, and remember: **the best way to learn something is to explain it to someone else.** Open source that knowledge. 🚀
