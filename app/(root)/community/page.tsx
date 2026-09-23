@@ -3,7 +3,6 @@ import DataRenderer from "@/components/DataRenderer";
 import Pagination from "@/components/Pagination";
 import UserCard from "@/components/cards/UserCard";
 import ROUTES from "@/constants/routes";
-import { DEFAULT_EMPTY } from "@/constants/states";
 import { getUsers } from "@/lib/actions/user.action";
 import { EMPTY_USER } from "@/constants/states";
 
@@ -39,7 +38,7 @@ export default async function Community({
         error={error}
         empty={EMPTY_USER}
         render={(users) => (
-          <div className="mt-12 flex flex-wrap gap-4">
+          <div className="mt-12 grid grid-cols-3 gap-4 max-sm:grid-cols-2">
             {users.map((user) => (
               <UserCard
                 key={user._id}
