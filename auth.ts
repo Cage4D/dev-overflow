@@ -6,11 +6,24 @@ import dbConnect from "./lib/mongoose";
 
 let _authPromise: ReturnType<typeof createAuth> | null = null;
 
+function getBaseUrl(): string {
+  if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+}
+
 async function createAuth() {
   const mongooseConnection = await dbConnect();
   const client = mongooseConnection.connection.getClient();
 
   return betterAuth({
+    secret: process.env.BETTER_AUTH_SECRET,
+    baseURL: getBaseUrl(),
     database: mongodbAdapter(client.db("DevFlow"), { client }),
     emailAndPassword: {
       enabled: true,
