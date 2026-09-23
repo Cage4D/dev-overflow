@@ -36,7 +36,7 @@ export default function UserAvatar({
         <Image
           src={imageUrl}
           alt={name}
-          className="object-cover"
+          className="size-full rounded-full object-cover"
           width={size}
           height={size}
           quality={100}
