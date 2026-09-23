@@ -103,7 +103,7 @@ auth.ts         better-auth setup. proxy.ts = middleware rules.
 
 ---
 
-## 🧠 How It Actually Works (Under the Hood, In Human Words)
+## 🧠 How It Actually Works
 
 ### Everything is a server action
 
@@ -131,7 +131,7 @@ const user = await mongoose.connection.getClient()
 
 Annoying? Slightly. But it's why signing up with Google "just works."
 
-### The database (models at a glance)
+### The database
 
 | Model | Collection | What it holds |
 |---|---|---|
@@ -151,7 +151,7 @@ Annoying? Slightly. But it's why signing up with Google "just works."
 
 ---
 
-## ⚠️ Things That Will Trip You Up (Read Before Weird Stuff Happens)
+## ⚠️ Things That Will Trip You Up
 
 1. **Schema changes need a server restart.** Mongoose registers a model *once per process*. If you edit `database/question.model.ts`, hot reload won't pick it up — stop `npm run dev` and start it again. (Trust us, we lost an afternoon to this one.)
 2. **`.env` changes also need a restart.**
